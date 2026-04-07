@@ -11,7 +11,7 @@ html,body{height:100%;overflow-x:hidden;font-family:'Montserrat',sans-serif}
 body{min-height:100vh;background:linear-gradient(160deg,#F3F0E9 0%,#E2DED7 50%,#F3F0E9 100%);display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
 body::before{content:'';position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(162,157,120,.08) 0%,transparent 70%);top:-150px;right:-100px;pointer-events:none}
 body::after{content:'';position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(195,176,164,.1) 0%,transparent 70%);bottom:-100px;left:-80px;pointer-events:none}
-#card{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:48px 40px;max-width:560px;width:100%;box-shadow:0 8px 40px rgba(112,98,96,.08),0 1px 3px rgba(112,98,96,.04);position:relative;z-index:1}
+#card{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:48px 40px;max-width:560px;width:100%;max-height:95vh;overflow-y:auto;box-shadow:0 8px 40px rgba(112,98,96,.08),0 1px 3px rgba(112,98,96,.04);position:relative;z-index:1}
 @media(max-width:600px){#card{padding:32px 18px}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 @keyframes sf{0%{opacity:0;transform:translateY(0) rotate(0)}20%{opacity:.7}100%{opacity:0;transform:translateY(500px) rotate(360deg)}}
@@ -31,6 +31,7 @@ var Q=[
 {id:"q8",t:"¿Cómo percibís nuestros precios?",tp:"sc",rq:1,l:["Muy altos","Algo altos","Normales","Buenos","Muy buenos"]},
 {id:"q9",t:"¿Te motivan las promociones para comprar?",tp:"s",rq:0,o:["Sí, mucho","Sí, a veces","No influyen demasiado"]},
 {id:"q10",t:"Si alguna vez agregaste productos al carrito pero no compraste, ¿por qué fue?",sb:"Podés elegir más de una",tp:"m",rq:0,o:["Costos de envío","Precio del producto","Estaba comparando","No era el momento","Me faltaba información","Otro"]},
+{id:"q10b",t:"¿Qué otro motivo tuviste?",tp:"tx",rq:0,ph:"Contanos...",show:function(){var a=A["q10"]||[];return a.indexOf("Otro")>-1}},
 {id:"q11",t:"Si compraste, ¿cómo calificarías tu experiencia general?",tp:"r",rq:0},
 {id:"q12",t:"¿Qué fue lo que más te gustó de Toque de Deco?",tp:"tx",rq:0,ph:"Contanos lo que más valorás..."},
 {id:"q13",t:"¿Qué podríamos mejorar?",tp:"tx",rq:0,ph:"Tu opinión nos ayuda a crecer..."},
@@ -41,36 +42,15 @@ var Q=[
 ];
 
 // ⚠️ REEMPLAZÁ ESTA URL con la de tu Google Apps Script desplegado
-var SHEETS_URL="https://script.google.com/macros/s/AKfycbzrXk0l4e5qzHMX_N7hIAgpc_UsAyXyQwFVwB42HMdSKF2ADyZHfcQjH5nSomy-WYpS/exec";
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbxnItkMyyM6Y4s5qH1vnZR_coL76c2JQMrBFeokhLhMg6bzG7S7zliQL0PHmQxtZNar/exec";
 
 var A={},S=0,C=document.getElementById("card");
 
-// Obtener el paso visible actual (saltea preguntas condicionales que no aplican)
-function visibleSteps(){
-  var steps=[];
-  for(var i=0;i<Q.length;i++){
-    if(Q[i].show && !Q[i].show()) continue;
-    steps.push(i);
-  }
-  return steps;
-}
-function currentVisibleIndex(){
-  var vs=visibleSteps();
-  for(var i=0;i<vs.length;i++) if(vs[i]===S) return i;
-  return 0;
-}
+function visibleSteps(){var s=[];for(var i=0;i<Q.length;i++){if(Q[i].show&&!Q[i].show())continue;s.push(i)}return s}
+function currentVisibleIndex(){var vs=visibleSteps();for(var i=0;i<vs.length;i++)if(vs[i]===S)return i;return 0}
 function totalVisible(){return visibleSteps().length}
-function nextStep(){
-  var vs=visibleSteps();
-  var ci=currentVisibleIndex();
-  if(ci<vs.length-1){S=vs[ci+1];render()}
-}
-function prevStep(){
-  var vs=visibleSteps();
-  var ci=currentVisibleIndex();
-  if(ci>0){S=vs[ci-1];render()}
-  else welcome();
-}
+function nextStep(){var vs=visibleSteps(),ci=currentVisibleIndex();if(ci<vs.length-1){S=vs[ci+1];render()}}
+function prevStep(){var vs=visibleSteps(),ci=currentVisibleIndex();if(ci>0){S=vs[ci-1];render()}else welcome()}
 function isLast(){var vs=visibleSteps();return currentVisibleIndex()===vs.length-1}
 
 function h(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
@@ -109,9 +89,12 @@ function thanks(){
 }
 
 function render(){
+  // Scroll card to top on each question
+  C.scrollTop=0;
+
   var q=Q[S],tv=totalVisible(),ci=currentVisibleIndex()+1,pct=Math.round(ci/tv*100);
-  var html='<div style="position:absolute;top:0;left:0;right:0;height:4px;background:#E2DED7;border-radius:20px 20px 0 0;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#A29D78,#C3B0A4);transition:width .5s ease;border-radius:4px"></div></div>';
-  html+='<div style="text-align:center;margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:4px;color:#706260;text-transform:uppercase">Toque de Deco</div>';
+  var html='<div style="position:sticky;top:0;left:0;right:0;height:4px;background:#E2DED7;border-radius:20px 20px 0 0;overflow:hidden;margin:-48px -40px 0 -40px;padding:0;z-index:2"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#A29D78,#C3B0A4);transition:width .5s ease;border-radius:4px"></div></div>';
+  html+='<div style="text-align:center;margin-top:24px;margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:4px;color:#706260;text-transform:uppercase">Toque de Deco</div>';
   html+='<div style="text-align:center;font-size:12px;color:#A29D78;font-weight:500;margin-bottom:24px;letter-spacing:1px">'+ci+' de '+tv+'</div>';
   html+='<div style="font-size:22px;font-weight:600;color:#706260;line-height:1.4;margin-bottom:8px;text-align:center">'+h(q.t)+'</div>';
   if(q.sb) html+='<div style="font-size:13px;color:#A29D78;text-align:center;margin-bottom:6px">'+h(q.sb)+'</div>';
@@ -200,7 +183,7 @@ function render(){
     wrap.style.cssText="display:flex;align-items:center;gap:10px;margin-top:4px";
     var prefix=document.createElement("span");
     prefix.style.cssText="font-size:16px;font-weight:600;color:#706260;padding:14px 0 14px 4px";
-    prefix.textContent="54";
+    prefix.textContent="+54";
     var inp=document.createElement("input");
     inp.type="tel";inp.inputMode="numeric";
     inp.style.cssText='flex:1;padding:14px 16px;border-radius:12px;border:2px solid #E2DED7;background:rgba(255,255,255,.6);font-size:16px;font-family:Montserrat,sans-serif;color:#706260;outline:none;transition:border-color .2s';
@@ -251,23 +234,16 @@ async function send(){
 
   var preguntas=[];
   Q.forEach(function(q){
-    // Saltear preguntas condicionales que no aplican
-    if(q.show && !q.show()) return;
+    if(q.show&&!q.show())return;
     var v=A[q.id];
     var resp="";
     if(v!==undefined&&v!==null) resp=Array.isArray(v)?v.join(", "):String(v);
-    // Para teléfono, agregar prefijo
-    if(q.tp==="phone" && resp) resp="+54 "+resp;
+    if(q.tp==="phone"&&resp) resp="54"+resp;
     preguntas.push({pregunta:q.t,respuesta:resp});
   });
 
   try{
-    await fetch(SHEETS_URL,{
-      method:"POST",
-      mode:"no-cors",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({preguntas:preguntas})
-    });
+    await fetch(SHEETS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({preguntas:preguntas})});
     thanks();
   }catch(e){
     var em=document.getElementById("errM");em.textContent="No se pudo enviar. Revisá tu conexión.";em.style.display="";
