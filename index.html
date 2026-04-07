@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Encuesta — Toque de Deco</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden;font-family:'Montserrat',sans-serif}
+body{min-height:100vh;background:linear-gradient(160deg,#F3F0E9 0%,#E2DED7 50%,#F3F0E9 100%);display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+body::before{content:'';position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(162,157,120,.08) 0%,transparent 70%);top:-150px;right:-100px;pointer-events:none}
+body::after{content:'';position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(195,176,164,.1) 0%,transparent 70%);bottom:-100px;left:-80px;pointer-events:none}
+#card{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:48px 40px;max-width:560px;width:100%;box-shadow:0 8px 40px rgba(112,98,96,.08),0 1px 3px rgba(112,98,96,.04);position:relative;z-index:1}
+@media(max-width:600px){#card{padding:32px 18px}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes sf{0%{opacity:0;transform:translateY(0) rotate(0)}20%{opacity:.7}100%{opacity:0;transform:translateY(500px) rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="card"></div>
+<script>
+var Q=[
+{id:"q1",t:"¿Cómo conociste Toque de Deco?",tp:"s",rq:1,o:["Instagram","Publicidad en Instagram / Facebook","Recomendación de alguien","Google","Ya conocía la marca","Otro"]},
+{id:"q2",t:"¿Compraste alguna vez en Toque de Deco?",tp:"s",rq:1,o:["Sí","Todavía no"]},
+{id:"q3",t:"¿Qué tan fácil te resulta navegar nuestra tienda online?",tp:"sc",rq:1,l:["Muy difícil","Difícil","Normal","Fácil","Muy fácil"]},
+{id:"q4",t:"¿Encontrás fácilmente los productos que buscás?",tp:"s",rq:0,o:["Sí, siempre","A veces","No, me cuesta"]},
+{id:"q5",t:"¿Qué mejorarías del sitio web?",tp:"tx",rq:0,ph:"Contanos qué cambiarías..."},
+{id:"q6",t:"¿Qué es lo más importante cuando comprás productos de decoración?",sb:"Podés elegir más de una",tp:"m",rq:1,o:["Precio","Diseño / estética","Calidad","Variedad","Envío rápido","Recomendaciones / inspiración"]},
+{id:"q7",t:"¿Qué tipo de productos te interesan más?",sb:"Podés elegir más de una",tp:"m",rq:1,o:["Textiles (sábanas, mantas, almohadones)","Decoración (objetos, espejos, bandejas)","Mesa (vajilla, bowls, tazas)","Aromas (velas, difusores)","Un poco de todo"]},
+{id:"q8",t:"¿Cómo percibís nuestros precios?",tp:"sc",rq:1,l:["Muy altos","Algo altos","Normales","Buenos","Muy buenos"]},
+{id:"q9",t:"¿Te motivan las promociones para comprar?",tp:"s",rq:0,o:["Sí, mucho","Sí, a veces","No influyen demasiado"]},
+{id:"q10",t:"Si alguna vez agregaste productos al carrito pero no compraste, ¿por qué fue?",sb:"Podés elegir más de una",tp:"m",rq:0,o:["Costos de envío","Precio del producto","Estaba comparando","No era el momento","Me faltaba información","Otro"]},
+{id:"q11",t:"Si compraste, ¿cómo calificarías tu experiencia general?",tp:"r",rq:0},
+{id:"q12",t:"¿Qué fue lo que más te gustó de Toque de Deco?",tp:"tx",rq:0,ph:"Contanos lo que más valorás..."},
+{id:"q13",t:"¿Qué podríamos mejorar?",tp:"tx",rq:0,ph:"Tu opinión nos ayuda a crecer..."},
+{id:"q14",t:"¿Qué tipo de contenido te gustaría ver más?",sb:"Podés elegir más de una",tp:"m",rq:0,o:["Ideas de decoración","Cómo combinar productos","Novedades","Promociones","Inspiración para el hogar"]},
+{id:"q15",t:"¿Te gustaría recibir ofertas o novedades por WhatsApp?",tp:"s",rq:1,o:["Sí","No"]},
+{id:"q16",t:"Si tuvieras que describir Toque de Deco en una palabra, ¿cuál sería?",tp:"tx",rq:0,ph:"Una sola palabra..."}
+];
+var FU="https://formsubmit.co/ajax/gberteli@somosempuje.com";
+var A={},S=0,C=document.getElementById("card");
+
+function h(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+// ===== WELCOME =====
+function welcome(){
+  C.innerHTML='<div style="text-align:center">'+
+    '<div style="font-size:11px;font-weight:600;letter-spacing:5px;color:#A29D78;text-transform:uppercase;margin-bottom:16px">Toque de Deco</div>'+
+    '<h1 style="font-size:26px;font-weight:700;color:#706260;line-height:1.3;margin-bottom:16px">Queremos conocerte mejor</h1>'+
+    '<p style="font-size:15px;color:#A29D78;line-height:1.7;margin-bottom:8px">Contestá esta breve encuesta y ayudanos a mejorar tu experiencia.</p>'+
+    '<p style="font-size:14px;color:#C3B0A4;margin-bottom:32px">🎁 Al finalizar, te regalamos un cupón de descuento.</p>'+
+    '<button id="btnStart" style="padding:14px 40px;border-radius:12px;border:none;background:linear-gradient(135deg,#A29D78,#706260);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:Montserrat,sans-serif;letter-spacing:1px">Empezar</button>'+
+    '<p style="font-size:12px;color:#C3B0A4;margin-top:16px">⏱ 2 minutos aprox.</p>'+
+  '</div>';
+  document.getElementById("btnStart").onclick=function(){S=0;render()};
+}
+
+// ===== THANKS =====
+function thanks(){
+  C.innerHTML='<div style="text-align:center">'+
+    '<div style="font-size:48px;margin-bottom:16px">🎉</div>'+
+    '<h1 style="font-size:26px;font-weight:700;color:#706260;margin-bottom:12px">¡Muchas gracias!</h1>'+
+    '<p style="font-size:15px;color:#A29D78;line-height:1.6;margin-bottom:24px">Tu opinión es muy valiosa para nosotros.<br>Como agradecimiento, te dejamos este cupón:</p>'+
+    '<div id="cBox" style="background:linear-gradient(135deg,rgba(162,157,120,.1),rgba(195,176,164,.1));border:2px dashed #A29D78;border-radius:16px;padding:28px 24px;text-align:center;position:relative;overflow:hidden;animation:pulse 2s ease infinite">'+
+      '<p style="font-size:13px;color:#A29D78;font-weight:500">10% OFF en tu próxima compra</p>'+
+      '<div style="font-size:32px;font-weight:700;color:#706260;letter-spacing:4px;margin:12px 0">GRACIAS10</div>'+
+      '<button id="btnCp" style="padding:10px 24px;border-radius:8px;border:1px solid #A29D78;background:transparent;color:#A29D78;font-size:13px;font-weight:600;cursor:pointer;font-family:Montserrat,sans-serif;margin-top:8px;transition:all .2s">Copiar código</button>'+
+    '</div>'+
+    '<p style="font-size:12px;color:#C3B0A4;margin-top:24px;line-height:1.6">Usalo en <strong>www.toquededeco.com.ar</strong> al momento de tu compra.</p>'+
+  '</div>';
+  document.getElementById("btnCp").onclick=function(){
+    navigator.clipboard.writeText("GRACIAS10");
+    var b=document.getElementById("btnCp");b.textContent="✓ Copiado";b.style.background="#A29D78";b.style.color="#fff";
+    setTimeout(function(){b.textContent="Copiar código";b.style.background="transparent";b.style.color="#A29D78"},2000);
+  };
+  // sparkles
+  var bx=document.getElementById("cBox");
+  for(var i=0;i<18;i++){var s=document.createElement("div");s.style.cssText="position:absolute;border-radius:50%;background:#A29D78;opacity:0;pointer-events:none;left:"+Math.random()*100+"%;top:-10px;width:"+(4+Math.random()*8)+"px;height:"+(4+Math.random()*8)+"px;animation:sf "+(1.5+Math.random()*2)+"s ease-in "+(Math.random()*2)+"s forwards";bx.appendChild(s)}
+}
+
+// ===== RENDER QUESTION =====
+function render(){
+  var q=Q[S],N=Q.length,pct=Math.round((S+1)/N*100);
+  var html='<div style="position:absolute;top:0;left:0;right:0;height:4px;background:#E2DED7;border-radius:20px 20px 0 0;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#A29D78,#C3B0A4);transition:width .5s ease;border-radius:4px"></div></div>';
+  html+='<div style="text-align:center;margin-bottom:8px;font-size:13px;font-weight:600;letter-spacing:4px;color:#706260;text-transform:uppercase">Toque de Deco</div>';
+  html+='<div style="text-align:center;font-size:12px;color:#A29D78;font-weight:500;margin-bottom:24px;letter-spacing:1px">'+(S+1)+' de '+N+'</div>';
+  html+='<div style="font-size:22px;font-weight:600;color:#706260;line-height:1.4;margin-bottom:8px;text-align:center">'+h(q.t)+'</div>';
+  if(q.sb) html+='<div style="font-size:13px;color:#A29D78;text-align:center;margin-bottom:6px">'+h(q.sb)+'</div>';
+  if(q.rq) html+='<div style="color:#C3B0A4;font-size:12px;text-align:center;margin-bottom:4px">* Obligatoria</div>';
+
+  html+='<div id="qBody" style="margin-top:20px"></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:32px"><button id="btnBk" style="padding:10px 20px;border-radius:10px;border:1px solid #E2DED7;background:transparent;color:#A29D78;font-size:14px;font-weight:500;cursor:pointer;font-family:Montserrat,sans-serif">← Atrás</button><div id="navR"></div></div>';
+  html+='<div id="errM" style="display:none;color:#c0392b;font-size:13px;text-align:center;margin-top:12px"></div>';
+  C.innerHTML=html;
+
+  document.getElementById("btnBk").onclick=function(){if(S>0){S--;render()}else welcome()};
+
+  var body=document.getElementById("qBody");
+  var bs='padding:14px 20px;border-radius:12px;font-size:15px;color:#706260;text-align:left;display:flex;align-items:center;gap:10px;font-family:Montserrat,sans-serif;cursor:pointer;transition:all .2s;width:100%;';
+
+  // SINGLE
+  if(q.tp==="s"){
+    q.o.forEach(function(o){
+      var sel=A[q.id]===o;
+      var btn=document.createElement("button");
+      btn.style.cssText=bs+'margin-bottom:10px;border:2px solid '+(sel?'#A29D78':'#E2DED7')+';background:'+(sel?'rgba(162,157,120,.08)':'transparent')+';font-weight:'+(sel?'600':'400');
+      var dot=document.createElement("span");
+      dot.style.cssText='flex-shrink:0;width:18px;height:18px;border-radius:50%;border:2px solid '+(sel?'#A29D78':'#D6D6D6')+';background:'+(sel?'#A29D78':'transparent');
+      btn.appendChild(dot);btn.appendChild(document.createTextNode(o));
+      btn.onclick=function(){A[q.id]=o;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      body.appendChild(btn);
+    });
+  }
+
+  // MULTI
+  if(q.tp==="m"){
+    var ar=A[q.id]||[];
+    q.o.forEach(function(o){
+      var sel=ar.indexOf(o)>-1;
+      var btn=document.createElement("button");
+      btn.style.cssText=bs+'margin-bottom:10px;border:2px solid '+(sel?'#A29D78':'#E2DED7')+';background:'+(sel?'rgba(162,157,120,.08)':'transparent')+';font-weight:'+(sel?'600':'400');
+      var bx=document.createElement("span");
+      bx.style.cssText='flex-shrink:0;width:18px;height:18px;border-radius:4px;border:2px solid '+(sel?'#A29D78':'#D6D6D6')+';background:'+(sel?'#A29D78':'transparent')+';display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700';
+      bx.textContent=sel?"✓":"";
+      btn.appendChild(bx);btn.appendChild(document.createTextNode(o));
+      btn.onclick=function(){var a=A[q.id]||[];A[q.id]=a.indexOf(o)>-1?a.filter(function(v){return v!==o}):a.concat(o);render()};
+      body.appendChild(btn);
+    });
+  }
+
+  // SCALE
+  if(q.tp==="sc"){
+    var row=document.createElement("div");
+    row.style.cssText="display:flex;gap:8px;justify-content:center;flex-wrap:wrap";
+    q.l.forEach(function(label,i){
+      var sel=A[q.id]===label;
+      var it=document.createElement("div");
+      it.style.cssText='display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 12px;border-radius:12px;border:2px solid '+(sel?'#A29D78':'#E2DED7')+';background:'+(sel?'rgba(162,157,120,.1)':'transparent')+';cursor:pointer;transition:all .2s;flex:1 1 80px;min-width:70px';
+      var n=document.createElement("span");n.style.cssText='font-size:20px;font-weight:700;color:'+(sel?'#706260':'#C3B0A4');n.textContent=i+1;
+      var lb=document.createElement("span");lb.style.cssText='font-size:11px;color:#A29D78;text-align:center;font-weight:500';lb.textContent=label;
+      it.appendChild(n);it.appendChild(lb);
+      it.onclick=function(){A[q.id]=label;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      row.appendChild(it);
+    });
+    body.appendChild(row);
+  }
+
+  // RATING
+  if(q.tp==="r"){
+    var row=document.createElement("div");
+    row.style.cssText="display:flex;gap:12px;justify-content:center";
+    for(var v=1;v<=5;v++){(function(v){
+      var f=(A[q.id]||0)>=v;
+      var btn=document.createElement("button");
+      btn.style.cssText='background:none;border:none;cursor:pointer;padding:4px;transition:transform .2s';
+      btn.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" style="color:'+(f?'#A29D78':'#E2DED7')+'"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.5"/></svg>';
+      btn.onmouseenter=function(){this.style.transform='scale(1.2)'};
+      btn.onmouseleave=function(){this.style.transform='scale(1)'};
+      btn.onclick=function(){A[q.id]=v;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      row.appendChild(btn);
+    })(v)}
+    body.appendChild(row);
+  }
+
+  // TEXT
+  if(q.tp==="tx"){
+    var ta=document.createElement("textarea");
+    ta.style.cssText='width:100%;min-height:100px;padding:16px;border-radius:12px;border:2px solid #E2DED7;background:rgba(255,255,255,.6);font-size:15px;font-family:Montserrat,sans-serif;color:#706260;resize:vertical;outline:none';
+    ta.placeholder=q.ph||"";ta.value=A[q.id]||"";
+    ta.onfocus=function(){this.style.borderColor='#A29D78'};
+    ta.onblur=function(){this.style.borderColor='#E2DED7'};
+    ta.oninput=function(){A[q.id]=ta.value;updNav()};
+    body.appendChild(ta);
+  }
+
+  updNav();
+}
+
+function ok(){var q=Q[S],v=A[q.id];if(!q.rq)return true;if(q.tp==="m")return v&&v.length>0;if(q.tp==="tx")return v&&v.trim().length>0;return v!==undefined&&v!==null&&v!==""}
+
+function updNav(){
+  var q=Q[S],N=Q.length,nav=document.getElementById("navR");if(!nav)return;nav.innerHTML="";
+  var g='border-radius:10px;border:none;background:linear-gradient(135deg,#A29D78,#706260);color:#fff;font-weight:600;font-family:Montserrat,sans-serif;cursor:pointer;transition:all .3s;';
+  var d='background:#E2DED7;color:#C3B0A4;cursor:not-allowed;';
+  var dis=q.rq&&!ok();
+
+  if(S===N-1){
+    var btn=document.createElement("button");
+    btn.style.cssText=g+'padding:14px 36px;font-size:15px;letter-spacing:1px;'+(dis?d:'');
+    btn.textContent="Enviar encuesta ✨";btn.disabled=dis;btn.id="btnSend";
+    btn.onclick=send;nav.appendChild(btn);
+  }else if(q.tp==="m"||q.tp==="tx"){
+    var btn=document.createElement("button");
+    btn.style.cssText=g+'padding:12px 28px;font-size:14px;letter-spacing:.5px;'+(dis?d:'');
+    btn.textContent="Siguiente →";btn.disabled=dis;
+    btn.onclick=function(){S++;render()};nav.appendChild(btn);
+  }
+}
+
+async function send(){
+  var q=Q[S];if(q.rq&&!ok())return;
+  var btn=document.getElementById("btnSend");
+  btn.textContent="Enviando...";btn.disabled=true;btn.style.background="#E2DED7";btn.style.color="#C3B0A4";
+  var p={_subject:"Nueva respuesta — Encuesta Toque de Deco",_cc:"comex@toquededeco.com.ar",_template:"table"};
+  Q.forEach(function(q){var v=A[q.id];if(v!==undefined&&v!==null)p[q.t]=Array.isArray(v)?v.join(", "):String(v)});
+  try{
+    var r=await fetch(FU,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(p)});
+    if(r.ok){thanks()}
+    else{showErr("Hubo un error al enviar. Intentá de nuevo.");btn.textContent="Enviar encuesta ✨";btn.disabled=false;btn.style.background="linear-gradient(135deg,#A29D78,#706260)";btn.style.color="#fff"}
+  }catch(e){showErr("No se pudo conectar. Revisá tu conexión.");btn.textContent="Enviar encuesta ✨";btn.disabled=false;btn.style.background="linear-gradient(135deg,#A29D78,#706260)";btn.style.color="#fff"}
+}
+function showErr(m){var e=document.getElementById("errM");if(e){e.textContent=m;e.style.display=""}}
+
+welcome();
+</script>
+</body>
+</html>
