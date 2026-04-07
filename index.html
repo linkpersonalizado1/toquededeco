@@ -31,7 +31,7 @@ var Q=[
 {id:"q8",t:"¿Cómo percibís nuestros precios?",tp:"sc",rq:1,l:["Muy altos","Algo altos","Normales","Buenos","Muy buenos"]},
 {id:"q9",t:"¿Te motivan las promociones para comprar?",tp:"s",rq:0,o:["Sí, mucho","Sí, a veces","No influyen demasiado"]},
 {id:"q10",t:"Si alguna vez agregaste productos al carrito pero no compraste, ¿por qué fue?",sb:"Podés elegir más de una",tp:"m",rq:0,o:["Costos de envío","Precio del producto","Estaba comparando","No era el momento","Me faltaba información","Otro"]},
-{id:"q10b",t:"¿Qué otro motivo tuviste?",tp:"tx",rq:0,ph:"Contanos...",show:function(){var a=A["q10"]||[];return a.indexOf("Otro")>-1}},
+
 {id:"q11",t:"Si compraste, ¿cómo calificarías tu experiencia general?",tp:"r",rq:0},
 {id:"q12",t:"¿Qué fue lo que más te gustó de Toque de Deco?",tp:"tx",rq:0,ph:"Contanos lo que más valorás..."},
 {id:"q13",t:"¿Qué podríamos mejorar?",tp:"tx",rq:0,ph:"Tu opinión nos ayuda a crecer..."},
@@ -42,7 +42,7 @@ var Q=[
 ];
 
 // ⚠️ REEMPLAZÁ ESTA URL con la de tu Google Apps Script desplegado
-var SHEETS_URL="https://script.google.com/macros/s/AKfycbxnItkMyyM6Y4s5qH1vnZR_coL76c2JQMrBFeokhLhMg6bzG7S7zliQL0PHmQxtZNar/exec";
+var SHEETS_URL="PEGAR_URL_DEL_APPS_SCRIPT_ACÁ";
 
 var A={},S=0,C=document.getElementById("card");
 
@@ -134,6 +134,18 @@ function render(){
       btn.onclick=function(){var a=A[q.id]||[];A[q.id]=a.indexOf(o)>-1?a.filter(function(v){return v!==o}):a.concat(o);render()};
       body.appendChild(btn);
     });
+    // Inline "Otro" text input for Q10
+    if(q.id==="q10"&&ar.indexOf("Otro")>-1){
+      var inp=document.createElement("input");
+      inp.type="text";
+      inp.style.cssText='width:100%;padding:14px 16px;border-radius:12px;border:2px solid #E2DED7;background:rgba(255,255,255,.6);font-size:15px;font-family:Montserrat,sans-serif;color:#706260;outline:none;transition:border-color .2s;margin-top:2px';
+      inp.placeholder="¿Cuál?";inp.value=A["q10_otro"]||"";
+      inp.onfocus=function(){this.style.borderColor='#A29D78'};
+      inp.onblur=function(){this.style.borderColor='#E2DED7'};
+      inp.oninput=function(){A["q10_otro"]=inp.value};
+      body.appendChild(inp);
+      setTimeout(function(){inp.focus()},100);
+    }
   }
 
   if(q.tp==="sc"){
@@ -239,6 +251,8 @@ async function send(){
     var resp="";
     if(v!==undefined&&v!==null) resp=Array.isArray(v)?v.join(", "):String(v);
     if(q.tp==="phone"&&resp) resp="54"+resp;
+    // Append "Otro" detail for Q10
+    if(q.id==="q10"&&A["q10_otro"]&&resp.indexOf("Otro")>-1) resp+=": "+A["q10_otro"];
     preguntas.push({pregunta:q.t,respuesta:resp});
   });
 
