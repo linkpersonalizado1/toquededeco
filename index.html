@@ -38,12 +38,14 @@ var Q=[
 {id:"q15",t:"¿Te gustaría recibir ofertas o novedades por WhatsApp?",tp:"s",rq:1,o:["Sí","No"]},
 {id:"q16",t:"Si tuvieras que describir Toque de Deco en una palabra, ¿cuál sería?",tp:"tx",rq:0,ph:"Una sola palabra..."}
 ];
-var FU="https://formsubmit.co/ajax/gberteli@somosempuje.com";
+
+// ⚠️ REEMPLAZÁ ESTA URL con la de tu Google Apps Script desplegado
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbzo9kqu5sgT1V_XxSevUtAaNzj_U5Px7EwBnCp5XNoAyWu3tZIeDS-bQwkQk4hBA4re/exec";
+
 var A={},S=0,C=document.getElementById("card");
 
 function h(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 
-// ===== WELCOME =====
 function welcome(){
   C.innerHTML='<div style="text-align:center">'+
     '<div style="font-size:11px;font-weight:600;letter-spacing:5px;color:#A29D78;text-transform:uppercase;margin-bottom:16px">Toque de Deco</div>'+
@@ -56,7 +58,6 @@ function welcome(){
   document.getElementById("btnStart").onclick=function(){S=0;render()};
 }
 
-// ===== THANKS =====
 function thanks(){
   C.innerHTML='<div style="text-align:center">'+
     '<div style="font-size:48px;margin-bottom:16px">🎉</div>'+
@@ -74,12 +75,10 @@ function thanks(){
     var b=document.getElementById("btnCp");b.textContent="✓ Copiado";b.style.background="#A29D78";b.style.color="#fff";
     setTimeout(function(){b.textContent="Copiar código";b.style.background="transparent";b.style.color="#A29D78"},2000);
   };
-  // sparkles
   var bx=document.getElementById("cBox");
   for(var i=0;i<18;i++){var s=document.createElement("div");s.style.cssText="position:absolute;border-radius:50%;background:#A29D78;opacity:0;pointer-events:none;left:"+Math.random()*100+"%;top:-10px;width:"+(4+Math.random()*8)+"px;height:"+(4+Math.random()*8)+"px;animation:sf "+(1.5+Math.random()*2)+"s ease-in "+(Math.random()*2)+"s forwards";bx.appendChild(s)}
 }
 
-// ===== RENDER QUESTION =====
 function render(){
   var q=Q[S],N=Q.length,pct=Math.round((S+1)/N*100);
   var html='<div style="position:absolute;top:0;left:0;right:0;height:4px;background:#E2DED7;border-radius:20px 20px 0 0;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#A29D78,#C3B0A4);transition:width .5s ease;border-radius:4px"></div></div>';
@@ -88,18 +87,15 @@ function render(){
   html+='<div style="font-size:22px;font-weight:600;color:#706260;line-height:1.4;margin-bottom:8px;text-align:center">'+h(q.t)+'</div>';
   if(q.sb) html+='<div style="font-size:13px;color:#A29D78;text-align:center;margin-bottom:6px">'+h(q.sb)+'</div>';
   if(q.rq) html+='<div style="color:#C3B0A4;font-size:12px;text-align:center;margin-bottom:4px">* Obligatoria</div>';
-
   html+='<div id="qBody" style="margin-top:20px"></div>';
   html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:32px"><button id="btnBk" style="padding:10px 20px;border-radius:10px;border:1px solid #E2DED7;background:transparent;color:#A29D78;font-size:14px;font-weight:500;cursor:pointer;font-family:Montserrat,sans-serif">← Atrás</button><div id="navR"></div></div>';
   html+='<div id="errM" style="display:none;color:#c0392b;font-size:13px;text-align:center;margin-top:12px"></div>';
   C.innerHTML=html;
-
   document.getElementById("btnBk").onclick=function(){if(S>0){S--;render()}else welcome()};
 
   var body=document.getElementById("qBody");
   var bs='padding:14px 20px;border-radius:12px;font-size:15px;color:#706260;text-align:left;display:flex;align-items:center;gap:10px;font-family:Montserrat,sans-serif;cursor:pointer;transition:all .2s;width:100%;';
 
-  // SINGLE
   if(q.tp==="s"){
     q.o.forEach(function(o){
       var sel=A[q.id]===o;
@@ -108,12 +104,11 @@ function render(){
       var dot=document.createElement("span");
       dot.style.cssText='flex-shrink:0;width:18px;height:18px;border-radius:50%;border:2px solid '+(sel?'#A29D78':'#D6D6D6')+';background:'+(sel?'#A29D78':'transparent');
       btn.appendChild(dot);btn.appendChild(document.createTextNode(o));
-      btn.onclick=function(){A[q.id]=o;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      btn.onclick=function(){A[q.id]=o;render();setTimeout(function(){if(S<Q.length-1){S++;render()}},280)};
       body.appendChild(btn);
     });
   }
 
-  // MULTI
   if(q.tp==="m"){
     var ar=A[q.id]||[];
     q.o.forEach(function(o){
@@ -129,7 +124,6 @@ function render(){
     });
   }
 
-  // SCALE
   if(q.tp==="sc"){
     var row=document.createElement("div");
     row.style.cssText="display:flex;gap:8px;justify-content:center;flex-wrap:wrap";
@@ -140,13 +134,12 @@ function render(){
       var n=document.createElement("span");n.style.cssText='font-size:20px;font-weight:700;color:'+(sel?'#706260':'#C3B0A4');n.textContent=i+1;
       var lb=document.createElement("span");lb.style.cssText='font-size:11px;color:#A29D78;text-align:center;font-weight:500';lb.textContent=label;
       it.appendChild(n);it.appendChild(lb);
-      it.onclick=function(){A[q.id]=label;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      it.onclick=function(){A[q.id]=label;render();setTimeout(function(){if(S<Q.length-1){S++;render()}},280)};
       row.appendChild(it);
     });
     body.appendChild(row);
   }
 
-  // RATING
   if(q.tp==="r"){
     var row=document.createElement("div");
     row.style.cssText="display:flex;gap:12px;justify-content:center";
@@ -157,13 +150,12 @@ function render(){
       btn.innerHTML='<svg width="44" height="44" viewBox="0 0 24 24" style="color:'+(f?'#A29D78':'#E2DED7')+'"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.5"/></svg>';
       btn.onmouseenter=function(){this.style.transform='scale(1.2)'};
       btn.onmouseleave=function(){this.style.transform='scale(1)'};
-      btn.onclick=function(){A[q.id]=v;render();setTimeout(function(){if(S<N-1){S++;render()}},280)};
+      btn.onclick=function(){A[q.id]=v;render();setTimeout(function(){if(S<Q.length-1){S++;render()}},280)};
       row.appendChild(btn);
     })(v)}
     body.appendChild(row);
   }
 
-  // TEXT
   if(q.tp==="tx"){
     var ta=document.createElement("textarea");
     ta.style.cssText='width:100%;min-height:100px;padding:16px;border-radius:12px;border:2px solid #E2DED7;background:rgba(255,255,255,.6);font-size:15px;font-family:Montserrat,sans-serif;color:#706260;resize:vertical;outline:none';
@@ -173,7 +165,6 @@ function render(){
     ta.oninput=function(){A[q.id]=ta.value;updNav()};
     body.appendChild(ta);
   }
-
   updNav();
 }
 
@@ -184,7 +175,6 @@ function updNav(){
   var g='border-radius:10px;border:none;background:linear-gradient(135deg,#A29D78,#706260);color:#fff;font-weight:600;font-family:Montserrat,sans-serif;cursor:pointer;transition:all .3s;';
   var d='background:#E2DED7;color:#C3B0A4;cursor:not-allowed;';
   var dis=q.rq&&!ok();
-
   if(S===N-1){
     var btn=document.createElement("button");
     btn.style.cssText=g+'padding:14px 36px;font-size:15px;letter-spacing:1px;'+(dis?d:'');
@@ -202,15 +192,32 @@ async function send(){
   var q=Q[S];if(q.rq&&!ok())return;
   var btn=document.getElementById("btnSend");
   btn.textContent="Enviando...";btn.disabled=true;btn.style.background="#E2DED7";btn.style.color="#C3B0A4";
-  var p={_subject:"Nueva respuesta — Encuesta Toque de Deco",_cc:"comex@toquededeco.com.ar",_template:"table"};
-  Q.forEach(function(q){var v=A[q.id];if(v!==undefined&&v!==null)p[q.t]=Array.isArray(v)?v.join(", "):String(v)});
+  document.getElementById("errM").style.display="none";
+
+  // Armar payload para Sheets
+  var preguntas=[];
+  Q.forEach(function(q){
+    var v=A[q.id];
+    var resp="";
+    if(v!==undefined&&v!==null) resp=Array.isArray(v)?v.join(", "):String(v);
+    preguntas.push({pregunta:q.t,respuesta:resp});
+  });
+
   try{
-    var r=await fetch(FU,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(p)});
-    if(r.ok){thanks()}
-    else{showErr("Hubo un error al enviar. Intentá de nuevo.");btn.textContent="Enviar encuesta ✨";btn.disabled=false;btn.style.background="linear-gradient(135deg,#A29D78,#706260)";btn.style.color="#fff"}
-  }catch(e){showErr("No se pudo conectar. Revisá tu conexión.");btn.textContent="Enviar encuesta ✨";btn.disabled=false;btn.style.background="linear-gradient(135deg,#A29D78,#706260)";btn.style.color="#fff"}
+    await fetch(SHEETS_URL,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({preguntas:preguntas})
+    });
+    // no-cors siempre devuelve opaque response, asumimos OK
+    thanks();
+  }catch(e){
+    var em=document.getElementById("errM");em.textContent="No se pudo enviar. Revisá tu conexión.";em.style.display="";
+    btn.textContent="Enviar encuesta ✨";btn.disabled=false;
+    btn.style.background="linear-gradient(135deg,#A29D78,#706260)";btn.style.color="#fff";
+  }
 }
-function showErr(m){var e=document.getElementById("errM");if(e){e.textContent=m;e.style.display=""}}
 
 welcome();
 </script>
