@@ -42,7 +42,7 @@ var Q=[
 ];
 
 // ⚠️ REEMPLAZÁ ESTA URL con la de tu Google Apps Script desplegado
-var SHEETS_URL="PEGAR_URL_DEL_APPS_SCRIPT_ACÁ";
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbxnItkMyyM6Y4s5qH1vnZR_coL76c2JQMrBFeokhLhMg6bzG7S7zliQL0PHmQxtZNar/exec";
 
 var A={},S=0,C=document.getElementById("card");
 
@@ -246,14 +246,17 @@ async function send(){
 
   var preguntas=[];
   Q.forEach(function(q){
-    if(q.show&&!q.show())return;
-    var v=A[q.id];
+    var applies=!q.show||q.show();
+    var v=applies?A[q.id]:undefined;
     var resp="";
     if(v!==undefined&&v!==null) resp=Array.isArray(v)?v.join(", "):String(v);
     if(q.tp==="phone"&&resp) resp="54"+resp;
-    // Append "Otro" detail for Q10
-    if(q.id==="q10"&&A["q10_otro"]&&resp.indexOf("Otro")>-1) resp+=": "+A["q10_otro"];
     preguntas.push({pregunta:q.t,respuesta:resp});
+    // Columna extra: detalle de "Otro" en Q10
+    if(q.id==="q10"){
+      var otro=(applies&&A["q10_otro"])?A["q10_otro"]:"";
+      preguntas.push({pregunta:"Otro motivo (detalle)",respuesta:otro});
+    }
   });
 
   try{
